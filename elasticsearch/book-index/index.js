@@ -1,6 +1,6 @@
 const csv = require('csv-parser')
 const fs = require("fs")
-const book_csv = "book_data.csv"
+const book_csv = "book-index/book_data.csv"
 const { Client } = require('@elastic/elasticsearch')
 const client = new Client({
     node: 'http://localhost:9200'
