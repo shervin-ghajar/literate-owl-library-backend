@@ -18,7 +18,7 @@ services:
     ports:
       - 9200:9200
     networks:
-      - elastic
+      - service-network
   #kibana
   kibana:
     image: docker.elastic.co/kibana/kibana:7.6.1
@@ -31,9 +31,21 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - elastic
+      - service-network
+  #redis
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    networks:
+      - service-network
+    volumes:
+      - redis-data:/data
 volumes:
+  redis-data:
+    driver: local
   esdata:
     driver: local
 networks:
-  elastic:
+  service-network:

@@ -10,6 +10,8 @@
   "author": "Shervin Ghajar",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "7.9.6",
+    "@babel/preset-env": "7.9.6",
     "@elastic/elasticsearch": "7.6.1",
     "babel-cli": "6.26.0",
     "babel-preset-env": "1.7.0",
@@ -19,6 +21,7 @@
     "redis": "3.0.2"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
     "nodemon": "2.0.3"
   }
 }
