@@ -1,6 +1,6 @@
 const csv = require('csv-parser')
 const fs = require("fs")
-const book_csv = "book-index/book_data.csv"
+const book_csv = "elasticsearch/book-index/book_data.csv"
 const { Client } = require('@elastic/elasticsearch')
 const client = new Client({
     node: 'http://localhost:9200'
@@ -35,12 +35,12 @@ fs.createReadStream(book_csv)
                 const body = dataset.flatMap(doc => [{ index: { _index: 'books' } }, doc])
                 const { body: bulkResponse } = await client.bulk({ refresh: true, body })
                 dataset = []
-                console.log(index, bulkResponse)
             }
+            console.log(index, bookData.length)
         }
         const body = dataset.flatMap(doc => [{ index: { _index: 'books' } }, doc])
         const { body: bulkResponse } = await client.bulk({ refresh: true, body })
-        console.log("Indexing Done", bulkResponse)
+        console.log("Indexing Done")
     })
 //----------------------------------------------------------------------------------
 function getRandomPrice(max) {

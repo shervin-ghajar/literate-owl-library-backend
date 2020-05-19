@@ -91,19 +91,15 @@ GET books/_search
 {
   "size" : 10,
   "query": {
-    "bool": {
-      "must": {
-        "match": {
+    "match": {
           "authors": {
-            "query": "rowli"
+            "query": "jane"
           }
         }
-      }
-    }
   }
 }
 
-
+---------------------------DELETE-------------------------
 POST books/_delete_by_query
 {
   "query": {
