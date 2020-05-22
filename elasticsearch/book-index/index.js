@@ -44,10 +44,33 @@ fs.createReadStream(book_csv)
     })
 //----------------------------------------------------------------------------------
 function getRandomPrice(max) {
-    let randomNum = Math.random() * max;
-    randomNum = randomNum > 6 ? randomNum : 0;
-    let price = randomNum.toFixed(2)
-    return Number(price);
+    let random_num = parseInt(Math.random() * max);
+    let random_digit = parseInt(Math.random() * 99);
+    let randomDigit;
+    if (random_digit >= 90) {
+        randomDigit = 99;
+    } else if (random_digit >= 80) {
+        randomDigit = 89;
+    } else if (random_digit >= 70) {
+        randomDigit = 79;
+    } else if (random_digit >= 60) {
+        randomDigit = 69;
+    } else if (random_digit >= 50) {
+        randomDigit = 59;
+    } else if (random_digit >= 40) {
+        randomDigit = 49;
+    } else if (random_digit >= 30) {
+        randomDigit = 39;
+    } else if (random_digit >= 24) {
+        randomDigit = 29;
+    } else if (random_digit >= 20) {
+        randomDigit = 25;
+    } else {
+        randomDigit = "00";
+    }
+    let price = `${random_num}.${randomDigit}`;
+    price = Number(price) > 6 ? price : "0";
+    return price;
 }
 function getRandomYear(min, max) {
     return Math.floor(Math.random() * (max - min) + min);

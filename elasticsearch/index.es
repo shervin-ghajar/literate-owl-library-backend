@@ -23,7 +23,11 @@ PUT books
                 "ngram": {
                   "type": "ngram",
                   "min_gram": 2,
-                  "max_gram": 4
+                  "max_gram": 4,
+                  "token_chars": [
+                        "letter",
+                        "digit"
+                    ]
                 },
                 "edge_ngram": {
                   "type": "edge_ngram",
@@ -32,7 +36,7 @@ PUT books
                 }
             },
             "analyzer": {
-                "rebuilt_english": {
+                "base_analyzer": {
                     "tokenizer": "standard",
                     "filter": [
                       "lowercase",
@@ -48,18 +52,19 @@ PUT books
         "properties": {
             "authors": {
                 "type": "text",
-                "analyzer": "rebuilt_english"
+                "analyzer": "base_analyzer"
             },
             "title": {
                 "type": "text",
-                "analyzer": "rebuilt_english"
+                "analyzer": "base_analyzer"
             },
             "desc": {
                 "type": "keyword",
                 "index": false
             },
             "genres": {
-                "type": "keyword"
+                "type": "text",
+                "analyzer": "base_analyzer"
             },
             "pages": {
                 "type": "integer",
@@ -72,7 +77,7 @@ PUT books
                 "type": "integer"
             },
             "price": {
-                "type": "float",
+                "type": "keyword",
                 "index": false
             },
             "year": {
