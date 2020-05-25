@@ -4,12 +4,13 @@ const { Client } = require('@elastic/elasticsearch')
 const client = new Client({ node: 'http://localhost:9200' })
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
-    router.get(`${route}`, async (req, res) => { // Get All Books
+    // ------------------------------Get All Books----------------------------------
+    router.get(`${route}`, async (req, res) => {
         let data = []
         let { body } = await client.search({
             index: 'books',
             size: 3,
-            from: 0,
+            // from: 0,
             body: {
                 query: {
                     match_all: {}
@@ -23,8 +24,8 @@ const prepare = (router, route) => {
         })
         return res.status(200).json(data)
     })
-    // ----------------------------------------------------------------
-    router.get(`${route}/book/:book_id`, async (req, res) => { // Get Book by Id
+    // ---------------------------------Get Book by Id-------------------------------
+    router.get(`${route}/book/:book_id`, async (req, res) => {
         let data = []
         let { book_id } = req.params
         let { body } = await client.get({
@@ -35,17 +36,22 @@ const prepare = (router, route) => {
         data = Object.assign({ id: _id }, _source)
         return res.status(200).json(data)
     })
-    // ----------------------------------------------------------------
-    router.get(`${route}/genres`, async (req, res) => { // Get By Genre
+    // ---------------------------------Get By Genre-------------------------------
+    router.get(`${route}/genres`, async (req, res) => {
         let data = []
-        let { genre } = req.body
+        let { genres } = req.body
+        let query = genres.map(genre => {
+            return (
+                { match: { genres: genre } }
+            )
+        })
         let { body } = await client.search({
             index: 'books',
             size: 3,
             body: {
                 query: {
-                    match: {
-                        genres: genre
+                    bool: {
+                        must: query
                     }
                 }
             }
@@ -57,8 +63,8 @@ const prepare = (router, route) => {
         })
         return res.status(200).json(data)
     })
-    // ----------------------------------------------------------------
-    router.get(`${route}/search`, async (req, res) => { // Search 
+    // ---------------------------------Search Books-------------------------------
+    router.get(`${route}/search`, async (req, res) => {
         let data = []
         let { query } = req.body
         let { body } = await client.search({
@@ -66,6 +72,17 @@ const prepare = (router, route) => {
             size: 5,
             body: {
                 query: {
+                    query_string: {
+                        fields: ["authors", "title^2"],
+                        query,
+                        minimum_should_match: 3
+                    },
+
+                    // multi_match: {
+                    //     query,
+                    //     fields: ["authors", "title^3"]
+                    // }
+
                     // function_score: {
                     //     query: {
                     //         multi_match: {
@@ -77,25 +94,26 @@ const prepare = (router, route) => {
                     //     random_score: {},
                     //     boost_mode: multiply
                     // }
-                    function_score: {
-                        query: { match_all: {} },
-                        // boost: 5,
-                        functions: [
-                            {
-                                filter: { match: { authors: query } },
-                                random_score: {},
-                                weight: 23
-                            },
-                            {
-                                filter: { match: { title: query } },
-                                weight: 42
-                            }
-                        ],
-                        // max_boost: 42,
-                        score_mode: "multiply",
-                        boost_mode: "multiply",
-                        // min_score: 42
-                    }
+
+                    // function_score: {
+                    //     query: { match_all: {} },
+                    //     // boost: 5,
+                    //     functions: [
+                    //         {
+                    //             filter: { match: { authors: query } },
+                    //             random_score: {},
+                    //             weight: 42
+                    //         },
+                    //         {
+                    //             filter: { match: { title: query } },
+                    //             weight: 23
+                    //         }
+                    //     ],
+                    //     // max_boost: 42,
+                    //     score_mode: "multiply",
+                    //     boost_mode: "multiply",
+                    //     // min_score: 42
+                    // }
                 }
             }
         })

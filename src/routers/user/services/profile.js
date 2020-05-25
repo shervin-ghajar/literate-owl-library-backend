@@ -1,42 +1,27 @@
 "use strict";
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
-    router.get(`${route}/:userId`, (req, res) => { // Get Profile
-        let { userId } = req.params
-        if (userId == 1) {
-            userId = Number(userId)
-            let data = {
-                id: userId,
-                name: "Shervin",
-                high_score: 23
+    // --------------------------Get Profile-----------------------
+    router.get(`${route}`, (req, res) => {
+        // validate/find token owner(user_id)
+        let error, data
+        if (email == "ssghajar@gmail.com") {
+            data = {
+                error: false,
+                message: {
+                    username: "ssghajar",
+                    email: email,
+                    password: password,
+                    token: "mpfjsdhf1lkj23HR130qe23QR2",
+                }
             }
             return res.status(200).json(data)
         }
-        let error = {
-            status: 404,
+        error = {
             error: true,
-            description: "user not found",
+            message: "token is unauthorized",
         }
-        return res.status(404).json(error)
-    })
-    // ------------------------------------------------------------
-    router.post(`${route}/:userId`, (req, res) => {
-        let { userId } = req.params
-        if (userId == 1) {
-            userId = parseInt(userId)
-            let data = {
-                id: userId,
-                name: "Shervin",
-                high_score: 23
-            }
-            return res.status(200).json(data)
-        }
-        let error = {
-            status: 404,
-            error: true,
-            description: "user not found",
-        }
-        return res.status(404).json(error)
+        return res.status(401).json(error)
     })
 }
 // ----------------------------------------------------------------
