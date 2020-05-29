@@ -30,7 +30,7 @@ PUT profile/_doc/ssghajar@gmail.com
     "email":"ssghajar@gmail.com",
     "password":"1480"
 }
-GET profile/_doc/ssghajar@gmail.com
+GET profile/_doc/kamyarghajar@gmail.com
 
 GET profile/_search
 {
