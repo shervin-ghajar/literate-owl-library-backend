@@ -1,70 +1,37 @@
-"use strict";
+// "use strict";
 // ----------------------------------------------------------------
-const { Client } = require('@elastic/elasticsearch')
-const client = new Client({ node: 'http://localhost:9200' })
+import { config } from '../../../config';
+import { Client } from '@elastic/elasticsearch';
+const es_client = new Client({ node: 'http://localhost:9200' });
+import redis from 'redis';
+const redis_client = redis.createClient();
+import jwt from 'jsonwebtoken';
+// ----------------------------------------------------------------
 const staticToken = "QclJtQLTjrmiDARMFnq73f8F0tQ5C7wT" //Blowfish /https://www.tools4noobs.com/online_tools/encrypt/
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
-    // --------------------------Login-----------------------
-    router.get(`${route}/login`, async (req, res) => {
-        let { email, password } = req.body
-        let error, data
-        // validate email
-        // check if the email exist
-        try {
-            const { body } = await client.get({
-                index: 'profile',
-                id: email
-            })
-            if (body.found) {
-                let { _id, _source } = body
-                if (_source.password === password) {
-                    let token = staticToken
-                    data = {
-                        error: false,
-                        user_id: _id,
-                        token
-                    }
-                    return res.status(200).json(data)
-                }
-                error = {
-                    error: true,
-                    message: "username or password is incorrect"
-                }
-                return res.status(403).json(error)
-            }
-            console.log(body)
-        } catch (error) {
-            error = {
-                error: true,
-                message: "user not found"
-            }
-            return res.status(404).json(error)
-        }
-    })
     // ------------------------------Signup------------------------------
     router.post(`${route}/signup`, async (req, res) => {
         let { username, email, password } = req.body
         try {
             // check if the user already exist
-            const { body } = await client.get({
+            const { body } = await es_client.get({
                 index: 'profile',
                 id: email
             })
             if (body.found) {
                 let error = {
                     error: true,
-                    message: "this email already exist",
+                    message: "email already exists",
                 }
                 return res.status(409).json(error)
             }
         } catch (error) {
             // user not found 
-            console.log("user not found ", error)
             if ("statusCode" in error && error.statusCode == 404) {
                 // create user
                 try {
-                    const { body } = await client.index({
+                    const { body } = await es_client.index({
                         index: 'profile',
                         id: email,
                         body: {
@@ -73,14 +40,12 @@ const prepare = (router, route) => {
                             password,
                         }
                     })
-                    await client.indices.refresh({ index: 'profile' })
+                    await es_client.indices.refresh({ index: 'profile' })
                     let { _id, result } = body
-                    console.warn(123123, body.statusCode)
                     if (result == 'created') {
                         let token = staticToken
                         let data = {
                             error: false,
-                            user_id: _id,
                             token,
                         }
                         return res.status(201).json(data)
@@ -89,6 +54,88 @@ const prepare = (router, route) => {
                     console.log("create", error)
                 }
             }
+        }
+    })
+    // --------------------------Login-----------------------
+    router.get(`${route}/login`, async (req, res) => {
+        let { agent } = req.headers
+        let { email, password } = req.body
+        let error, data
+        // validate email
+        // check if the email exist
+        try {
+            const { body } = await es_client.get({
+                index: 'profile',
+                id: email
+            })
+            if (body.found) {
+                let { _id, _source } = body
+                if (_source.password === password) {
+                    let key = `${_id}_${agent}`
+                    console.log(key)
+                    let token = jwt.sign({ token: key }, config.secret)
+                    console.log(token)
+                    redis_client.set(key, token)
+                    data = {
+                        error: false,
+                        token
+                    }
+                    return res.status(200).json(data)
+                }
+                error = {
+                    error: true,
+                    message: "username or password is incorrect"
+                }
+                return res.status(404).json(error) // actually status code must be 403
+            }
+        } catch (error) {
+            error = {
+                error: true,
+                message: "user not found"
+            }
+            return res.status(404).json(error)
+        }
+    })
+    // --------------------------Logout-----------------------
+    router.post(`${route}/logout`, (req, res) => {
+        let { authorization, agent } = req.headers
+        let data
+        let error = {
+            error: true,
+            message: "token unauthorized"
+        }
+        if (authorization && agent) {
+            let auth_token = authorization.slice(7, authorization.length)
+            //Todo Handle scenarios
+            try {
+                return jwt.verify(auth_token, config.secret, (jwtErr, decoded) => {
+                    console.log("decoded", decoded, decoded && 'token' in decoded)
+                    if (!(decoded && 'token' in decoded)) {
+                        console.error("jwtErr", jwtErr)
+                        return res.status(401).json(error)
+                    }
+                    redis_client.del(decoded.token)
+                    data = {
+                        error: false,
+                        message: "you successfuly loged out"
+                    }
+                    return res.status(200).json(data)
+                });
+            } catch (err) {
+                console.error("err", err)
+                error = {
+                    error: true,
+                    message: "token unauthorized"
+                }
+                return res.status(401).json(error)
+            }
+        }
+        else {
+            error = {
+                error: true,
+                message: "Bad Request"
+            }
+            return res.status(400).json(error)
         }
     })
 }

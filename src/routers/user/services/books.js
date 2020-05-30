@@ -1,13 +1,13 @@
 "use strict";
 // ----------------------------------------------------------------
-const { Client } = require('@elastic/elasticsearch')
-const client = new Client({ node: 'http://localhost:9200' })
+import { Client } from '@elastic/elasticsearch';
+const es_client = new Client({ node: 'http://localhost:9200' })
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
     // ------------------------------Get All Books----------------------------------
     router.get(`${route}`, async (req, res) => {
         let data = []
-        let { body } = await client.search({
+        let { body } = await es_client.search({
             index: 'books',
             size: 3,
             // from: 0,
@@ -28,7 +28,7 @@ const prepare = (router, route) => {
     router.get(`${route}/book/:book_id`, async (req, res) => {
         let data = []
         let { book_id } = req.params
-        let { body } = await client.get({
+        let { body } = await es_client.get({
             index: 'books',
             id: book_id,
         })
@@ -45,7 +45,7 @@ const prepare = (router, route) => {
                 { match: { genres: genre } }
             )
         })
-        let { body } = await client.search({
+        let { body } = await es_client.search({
             index: 'books',
             size: 3,
             body: {
@@ -67,7 +67,7 @@ const prepare = (router, route) => {
     router.get(`${route}/search`, async (req, res) => {
         let data = []
         let { query } = req.body
-        let { body } = await client.search({
+        let { body } = await es_client.search({
             index: 'books',
             size: 5,
             body: {
