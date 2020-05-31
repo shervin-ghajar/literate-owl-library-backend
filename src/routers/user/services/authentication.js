@@ -2,9 +2,9 @@
 // ----------------------------------------------------------------
 import { config } from '../../../config';
 import { Client } from '@elastic/elasticsearch';
-const es_client = new Client({ node: 'http://localhost:9200' });
+const esClient = new Client({ node: 'http://localhost:9200' });
 import redis from 'redis';
-const redis_client = redis.createClient();
+const redisClient = redis.createClient();
 import jwt from 'jsonwebtoken';
 // ----------------------------------------------------------------
 const staticToken = "QclJtQLTjrmiDARMFnq73f8F0tQ5C7wT" //Blowfish /https://www.tools4noobs.com/online_tools/encrypt/
@@ -15,7 +15,7 @@ const prepare = (router, route) => {
         let { username, email, password } = req.body
         try {
             // check if the user already exist
-            const { body } = await es_client.get({
+            const { body } = await esClient.get({
                 index: 'profile',
                 id: email
             })
@@ -31,7 +31,7 @@ const prepare = (router, route) => {
             if ("statusCode" in error && error.statusCode == 404) {
                 // create user
                 try {
-                    const { body } = await es_client.index({
+                    const { body } = await esClient.index({
                         index: 'profile',
                         id: email,
                         body: {
@@ -40,7 +40,7 @@ const prepare = (router, route) => {
                             password,
                         }
                     })
-                    await es_client.indices.refresh({ index: 'profile' })
+                    await esClient.indices.refresh({ index: 'profile' })
                     let { _id, result } = body
                     if (result == 'created') {
                         let token = staticToken
@@ -64,7 +64,7 @@ const prepare = (router, route) => {
         // validate email
         // check if the email exist
         try {
-            const { body } = await es_client.get({
+            const { body } = await esClient.get({
                 index: 'profile',
                 id: email
             })
@@ -75,7 +75,7 @@ const prepare = (router, route) => {
                     console.log(key)
                     let token = jwt.sign({ token: key }, config.secret)
                     console.log(token)
-                    redis_client.set(key, token)
+                    redisClient.set(key, token)
                     data = {
                         error: false,
                         token
@@ -105,16 +105,16 @@ const prepare = (router, route) => {
             message: "token unauthorized"
         }
         if (authorization && agent) {
-            let auth_token = authorization.slice(7, authorization.length)
+            let authToken = authorization.slice(7, authorization.length)
             //Todo Handle scenarios
             try {
-                return jwt.verify(auth_token, config.secret, (jwtErr, decoded) => {
+                return jwt.verify(authToken, config.secret, (jwtErr, decoded) => {
                     console.log("decoded", decoded, decoded && 'token' in decoded)
                     if (!(decoded && 'token' in decoded)) {
                         console.error("jwtErr", jwtErr)
                         return res.status(401).json(error)
                     }
-                    redis_client.del(decoded.token)
+                    redisClient.del(decoded.token)
                     data = {
                         error: false,
                         message: "you successfuly loged out"
@@ -129,8 +129,7 @@ const prepare = (router, route) => {
                 }
                 return res.status(401).json(error)
             }
-        }
-        else {
+        } else {
             error = {
                 error: true,
                 message: "Bad Request"

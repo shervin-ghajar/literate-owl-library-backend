@@ -106,7 +106,7 @@ GET books/_search
 
 GET books/_doc/7ZjoPXIBk6_coDgKK5Nq
 
----------------------------DELETE-------------------------
+// ---------------------------DELETE-------------------------
 POST books/_delete_by_query
 {
   "query": {

@@ -19,6 +19,14 @@ const listen = () => {
     app.use(bodyParser.json({ limit: "1mb" }));
     // routes
     app.use(`${BaseDomain}/user`, userRouter())
+    // wrong routes
+    app.all('*', function (req, res) {
+        let error = {
+            error: false,
+            message: "route not found"
+        }
+        res.status(404).json(error)
+    })
     // CreateServer - Set Port Listener
 
     // let httpServer = http.createServer(app);
