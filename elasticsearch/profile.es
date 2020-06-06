@@ -19,6 +19,19 @@ PUT profile
             },
             "password":{
                 "type":"keyword"
+            },
+            "balance":{
+                "type":"float"
+            },
+            "wishlist":{
+                "type":"keyword"
+            },
+            "purchased":{
+                "properties": {
+                    "book_id":{
+                        "type":"keyword"
+                    }
+                }
             }
         }
     }
@@ -30,7 +43,7 @@ PUT profile/_doc/ssghajar@gmail.com
     "email":"ssghajar@gmail.com",
     "password":"1480"
 }
-GET profile/_doc/kamyarghajar@gmail.com
+GET profile/_doc/ssghajar@gmail.com
 
 GET profile/_search
 {
@@ -40,6 +53,13 @@ GET profile/_search
 }
 
 // ---------------------------DELETE-------------------------
+POST profile/_delete_by_query
+{
+  "query": {
+        "match_all": {}
+    }
+}
+
 POST profile/_delete_by_query
 {
   "query": {

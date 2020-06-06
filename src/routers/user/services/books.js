@@ -1,13 +1,13 @@
 "use strict";
 // ----------------------------------------------------------------
 import { Client } from '@elastic/elasticsearch';
-const es_client = new Client({ node: 'http://localhost:9200' })
+const esClient = new Client({ node: 'http://localhost:9200' })
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
     // ------------------------------Get All Books----------------------------------
     router.get(`${route}`, async (req, res) => {
         let data = []
-        let { body } = await es_client.search({
+        let { body } = await esClient.search({
             index: 'books',
             size: 3,
             // from: 0,
@@ -25,12 +25,12 @@ const prepare = (router, route) => {
         return res.status(200).json(data)
     })
     // ---------------------------------Get Book by Id-------------------------------
-    router.get(`${route}/book/:book_id`, async (req, res) => {
+    router.get(`${route}/book/:bookId`, async (req, res) => {
         let data = []
-        let { book_id } = req.params
-        let { body } = await es_client.get({
+        let { bookId } = req.params
+        let { body } = await esClient.get({
             index: 'books',
-            id: book_id,
+            id: bookId,
         })
         let { _id, _source } = body
         data = Object.assign({ id: _id }, _source)
@@ -45,7 +45,7 @@ const prepare = (router, route) => {
                 { match: { genres: genre } }
             )
         })
-        let { body } = await es_client.search({
+        let { body } = await esClient.search({
             index: 'books',
             size: 3,
             body: {
@@ -67,7 +67,7 @@ const prepare = (router, route) => {
     router.get(`${route}/search`, async (req, res) => {
         let data = []
         let { query } = req.body
-        let { body } = await es_client.search({
+        let { body } = await esClient.search({
             index: 'books',
             size: 5,
             body: {

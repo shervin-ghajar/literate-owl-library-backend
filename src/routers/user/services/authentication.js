@@ -13,6 +13,15 @@ const prepare = (router, route) => {
     // ------------------------------Signup------------------------------
     router.post(`${route}/signup`, async (req, res) => {
         let { username, email, password } = req.body
+        let { agent } = req.headers
+        let error = {
+            error: true,
+            message: "token unauthorized"
+        }
+        let data = {
+            error: false,
+            message: []
+        }
         try {
             // check if the user already exist
             const { body } = await esClient.get({
@@ -20,10 +29,7 @@ const prepare = (router, route) => {
                 id: email
             })
             if (body.found) {
-                let error = {
-                    error: true,
-                    message: "email already exists",
-                }
+                error.message = "email already exists"
                 return res.status(409).json(error)
             }
         } catch (error) {
@@ -38,20 +44,25 @@ const prepare = (router, route) => {
                             username,
                             email,
                             password,
+                            balance: 0,
+                            wishlist: [],
+                            purchased: []
                         }
                     })
                     await esClient.indices.refresh({ index: 'profile' })
                     let { _id, result } = body
                     if (result == 'created') {
-                        let token = staticToken
-                        let data = {
-                            error: false,
-                            token,
-                        }
+                        let key = `${_id}_${agent}`
+                        console.log("ket", key)
+                        let token = jwt.sign({ token: key }, config.secret)
+                        console.log("token", token)
+                        redisClient.set(key, token)
+                        data.token = token
+                        data.message = "user created"
                         return res.status(201).json(data)
                     }
                 } catch (error) {
-                    console.log("create", error)
+                    console.log("create-err", error)
                 }
             }
         }
@@ -109,7 +120,6 @@ const prepare = (router, route) => {
             //Todo Handle scenarios
             try {
                 return jwt.verify(authToken, config.secret, (jwtErr, decoded) => {
-                    console.log("decoded", decoded, decoded && 'token' in decoded)
                     if (!(decoded && 'token' in decoded)) {
                         console.error("jwtErr", jwtErr)
                         return res.status(401).json(error)
