@@ -92,6 +92,7 @@ PUT books
     }
 }
 
+GET books/_doc/85joPXIBk6_coDgKUt6-
 GET books/_search
 {
   "size" : 10,

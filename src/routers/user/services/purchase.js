@@ -8,9 +8,8 @@ const redisClient = redis.createClient();
 import jwt from 'jsonwebtoken';
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
-    // --------------------------Get Wishlist--------------------------------
-    router.get(`${route}`, (req, res) => {
-        // validate/find token owner(user_id)
+    // --------------------------Get Purchased-----------------------
+    router.get(`${route}d`, (req, res) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
@@ -18,7 +17,6 @@ const prepare = (router, route) => {
         }
         let data = {
             error: false,
-            message: []
         }
         if (authorization && agent) {
             let authToken = authorization.slice(7, authorization.length)
@@ -37,12 +35,12 @@ const prepare = (router, route) => {
                                 const esRequest = esClient.get({
                                     index: 'profile',
                                     id: userId,
-                                    _source: ["wishlist"]
+                                    _source: ["purchased"]
                                 })
                                 esRequest.then(({ body }) => {
                                     if (body.found) {
-                                        let { wishlist } = body._source
-                                        data.message = [...wishlist]
+                                        let { purchased } = body._source
+                                        data.message = [...purchased]
                                         return res.status(200).json(data)
                                     }
                                     error.message = "Bad Request"
@@ -70,7 +68,7 @@ const prepare = (router, route) => {
             return res.status(400).json(error)
         }
     })
-    // --------------------------Add & Remove Wishlist--------------------------------
+    // --------------------------Purchase-----------------------
     router.post(`${route}/:bookId`, (req, res) => {
         let { bookId } = req.params
         let { authorization, agent } = req.headers
@@ -94,41 +92,61 @@ const prepare = (router, route) => {
                             let agentIndex = decoded.token.search(agent)
                             if (agentIndex != -1) {
                                 let userId = decoded.token.slice(0, agentIndex - 1)
-                                // elasticsearch get data with userId 
-                                const esGetRequest = esClient.get({
-                                    index: 'profile',
-                                    id: userId,
-                                    _source: ["wishlist"]
+                                // elasticsearch check & get data with bookId 
+                                const esGetBook = esClient.get({
+                                    index: 'books',
+                                    id: bookId,
+                                    _source: ["price"]
                                 })
-                                esGetRequest.then(({ body }) => {
-                                    if (!body.found) {
+                                esGetBook.then((bookRes) => {
+                                    if (!bookRes.body.found) {
                                         error.message = "Bad Request"
                                         return res.status(400).json(error)
                                     }
-                                    let { wishlist } = body._source
-                                    let isWishlisted = wishlist.some(el => el == bookId)
-                                    let newWishList = isWishlisted ? wishlist.filter(el => el != bookId) : [bookId, ...wishlist]
-                                    const esUpdateRequest = esClient.update({
+                                    let { price } = bookRes.body._source
+                                    // elasticsearch get data with userId 
+                                    const esGetProile = esClient.get({
                                         index: 'profile',
                                         id: userId,
-                                        body: {
-                                            doc: {
-                                                wishlist: newWishList
-                                            }
-                                        }
+                                        _source: ["balance", "purchased"]
                                     })
-                                    esUpdateRequest.then(({ body }) => {
-                                        console.log("body-update", body)
-                                        data.message = isWishlisted ? "removed" : "added"
-                                        data.wishlist = newWishList
-                                        return res.status(200).json(data)
-                                    }).catch((err) => {
-                                        console.error("error-update", err)
+                                    esGetProile.then((getProfileRes) => {
+                                        if (!getProfileRes.body.found) {
+                                            error.message = "Bad Request"
+                                            return res.status(400).json(error)
+                                        }
+                                        let { balance, purchased } = getProfileRes.body._source
+                                        let newBalance = Number(balance) - Number(price)
+                                        let newPurchased = [bookId, ...purchased]
+                                        console.log(balance, price, newBalance)
+                                        if (newBalance >= 0) {
+                                            const esUpdateRequest = esClient.update({
+                                                index: 'profile',
+                                                id: userId,
+                                                body: {
+                                                    doc: {
+                                                        balance: newBalance,
+                                                        purchased: newPurchased
+                                                    }
+                                                }
+                                            })
+                                            esUpdateRequest.then((updateProfileRes) => {
+                                                console.log("body-update", updateProfileRes.body)
+                                                data.message = "book purchased successfully"
+                                                data.purchased = newPurchased
+                                                return res.status(200).json(data)
+                                            }).catch((err) => {
+                                                console.error("updateProfile-err", err)
+                                            })
+                                        } else {
+                                            error.message = "Not Acceptable - balance is lower than book price"
+                                            return res.status(406).json(error)
+                                        }
+                                    }).catch(err => {
+                                        console.log("getProfile-err", err)
                                     })
                                 }).catch(err => {
-                                    console.error("error", err)
-                                    error.message = "Bad Request"
-                                    return res.status(400).json(error)
+                                    console.log("books-err", err)
                                 })
                             } else {
                                 return res.status(401).json(error)
@@ -149,4 +167,5 @@ const prepare = (router, route) => {
         }
     })
 }
+// ----------------------------------------------------------------
 export default { prepare }

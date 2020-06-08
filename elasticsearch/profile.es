@@ -27,11 +27,7 @@ PUT profile
                 "type":"keyword"
             },
             "purchased":{
-                "properties": {
-                    "book_id":{
-                        "type":"keyword"
-                    }
-                }
+                "type":"keyword"
             }
         }
     }

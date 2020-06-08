@@ -53,9 +53,7 @@ const prepare = (router, route) => {
                     let { _id, result } = body
                     if (result == 'created') {
                         let key = `${_id}_${agent}`
-                        console.log("ket", key)
                         let token = jwt.sign({ token: key }, config.secret)
-                        console.log("token", token)
                         redisClient.set(key, token)
                         data.token = token
                         data.message = "user created"
@@ -83,9 +81,7 @@ const prepare = (router, route) => {
                 let { _id, _source } = body
                 if (_source.password === password) {
                     let key = `${_id}_${agent}`
-                    console.log(key)
                     let token = jwt.sign({ token: key }, config.secret)
-                    console.log(token)
                     redisClient.set(key, token)
                     data = {
                         error: false,
@@ -127,7 +123,7 @@ const prepare = (router, route) => {
                     redisClient.del(decoded.token)
                     data = {
                         error: false,
-                        message: "you successfuly loged out"
+                        message: "you successfully loged out"
                     }
                     return res.status(200).json(data)
                 });

@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken';
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
     // --------------------------Get Profile-----------------------
-    router.get(`${route}`, async (req, res) => {
+    router.get(`${route}`, (req, res) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
@@ -26,7 +26,7 @@ const prepare = (router, route) => {
                         console.error("jwtErr", jwtErr)
                         return res.status(401).json(error)
                     }
-                    redisClient.get(decoded.token, async (err, reply) => {
+                    redisClient.get(decoded.token, (err, reply) => {
                         if (reply) {
                             let agentIndex = decoded.token.search(agent)
                             if (agentIndex != -1) {
@@ -76,7 +76,7 @@ const prepare = (router, route) => {
         }
     })
     // --------------------------Update Profile-----------------------
-    router.put(`${route}`, async (req, res) => {
+    router.put(`${route}`, (req, res) => {
         let { username, password } = req.body
         let { authorization, agent } = req.headers
         let error = {
@@ -94,7 +94,7 @@ const prepare = (router, route) => {
                         console.error("jwtErr", jwtErr)
                         return res.status(401).json(error)
                     }
-                    redisClient.get(decoded.token, async (err, reply) => {
+                    redisClient.get(decoded.token, (err, reply) => {
                         if (reply) {
                             let agentIndex = decoded.token.search(agent)
                             if (agentIndex != -1) {

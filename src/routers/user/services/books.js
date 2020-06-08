@@ -6,35 +6,101 @@ const esClient = new Client({ node: 'http://localhost:9200' })
 const prepare = (router, route) => {
     // ------------------------------Get All Books----------------------------------
     router.get(`${route}`, async (req, res) => {
-        let data = []
-        let { body } = await esClient.search({
-            index: 'books',
-            size: 3,
-            // from: 0,
-            body: {
-                query: {
-                    match_all: {}
+        let data = {
+            error: false,
+            message: []
+        }
+        let error = {
+            error: true,
+            message: "Bad Request"
+        }
+        try {
+            let { body } = await esClient.search({
+                index: 'books',
+                size: 5,
+                // from: 0,
+                body: {
+                    query: {
+                        match_all: {}
+                    }
                 }
-            }
-        })
-        let { hits } = body.hits
-        hits.map((hit, i) => {
-            let { _id, _source } = hit
-            data[i] = Object.assign({ id: _id }, _source)
-        })
-        return res.status(200).json(data)
+            })
+            let { hits } = body.hits
+            let books = []
+            hits.map((hit, i) => {
+                let { _id, _source } = hit
+                books[i] = Object.assign({ id: _id }, _source)
+            })
+            data.message = books
+            return res.status(200).json(data)
+        } catch (err) {
+            console.log("search-err", err)
+            return res.status(400).json(error)
+        }
     })
     // ---------------------------------Get Book by Id-------------------------------
     router.get(`${route}/book/:bookId`, async (req, res) => {
-        let data = []
+        let data = {
+            error: false,
+            message: []
+        }
+        let error = {
+            error: true,
+            message: "Bad Request"
+        }
         let { bookId } = req.params
-        let { body } = await esClient.get({
-            index: 'books',
-            id: bookId,
-        })
-        let { _id, _source } = body
-        data = Object.assign({ id: _id }, _source)
-        return res.status(200).json(data)
+        try {
+            let { body } = await esClient.get({
+                index: 'books',
+                id: bookId,
+            })
+            let { _id, _source } = body
+            if (body.found) {
+                let book = Object.assign({ id: _id }, _source)
+                data.message = book
+                return res.status(200).json(data)
+            }
+            error.message = "book not found"
+            return res.status(404).json(error)
+        } catch (err) {
+            console.log("get-err", err)
+            return res.status(400).json(error)
+        }
+    })
+    // ---------------------------------Get Books by Ids-------------------------------
+    router.get(`${route}/ids`, async (req, res) => {
+        let { ids } = req.body
+        let data = {
+            error: false,
+            message: []
+        }
+        let error = {
+            error: true,
+            message: "Bad Request"
+        }
+        try {
+            let { body } = await esClient.mget({
+                index: 'books',
+                body: {
+                    ids: [...ids],
+                }
+            })
+            let { docs } = body
+            if (docs.length > 0) {
+                let books = []
+                docs.map((doc, i) => {
+                    let { _id, _source } = doc
+                    books[i] = Object.assign({ id: _id }, _source)
+                })
+                data.message = books
+                return res.status(200).json(data)
+            }
+            error.message = "book not found"
+            return res.status(404).json(error)
+        } catch (err) {
+            console.log("mget-err", err)
+            return res.status(200).json(error)
+        }
     })
     // ---------------------------------Get By Genre-------------------------------
     router.get(`${route}/genres`, async (req, res) => {
