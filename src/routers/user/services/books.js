@@ -104,94 +104,122 @@ const prepare = (router, route) => {
     })
     // ---------------------------------Get By Genre-------------------------------
     router.get(`${route}/genres`, async (req, res) => {
-        let data = []
         let { genres } = req.body
+        let data = {
+            error: false,
+            message: []
+        }
+        let error = {
+            error: true,
+            message: "Bad Request"
+        }
         let query = genres.map(genre => {
             return (
                 { match: { genres: genre } }
             )
         })
-        let { body } = await esClient.search({
-            index: 'books',
-            size: 3,
-            body: {
-                query: {
-                    bool: {
-                        must: query
+        try {
+            let { body } = await esClient.search({
+                index: 'books',
+                size: 3,
+                body: {
+                    query: {
+                        bool: {
+                            must: query
+                        }
                     }
                 }
-            }
-        })
-        let { hits } = body.hits
-        hits.map((hit, i) => {
-            let { _id, _source } = hit
-            data[i] = Object.assign({ id: _id }, _source)
-        })
-        return res.status(200).json(data)
+            })
+            let { hits } = body.hits
+            let books = []
+            hits.map((hit, i) => {
+                let { _id, _source } = hit
+                books[i] = Object.assign({ id: _id }, _source)
+            })
+            data.message = books
+            return res.status(200).json(data)
+        } catch (err) {
+            console.log("genre-err", err)
+            return res.status(400).json(error)
+        }
     })
     // ---------------------------------Search Books-------------------------------
     router.get(`${route}/search`, async (req, res) => {
-        let data = []
         let { query } = req.body
-        let { body } = await esClient.search({
-            index: 'books',
-            size: 5,
-            body: {
-                query: {
-                    query_string: {
-                        fields: ["authors", "title^2"],
-                        query,
-                        minimum_should_match: 3
-                    },
-
-                    // multi_match: {
-                    //     query,
-                    //     fields: ["authors", "title^3"]
-                    // }
-
-                    // function_score: {
-                    //     query: {
-                    //         multi_match: {
-                    //             query,
-                    //             fields: [authors ^ 3, title]
-                    //         }
-                    //     },
-                    //     boost: 5,
-                    //     random_score: {},
-                    //     boost_mode: multiply
-                    // }
-
-                    // function_score: {
-                    //     query: { match_all: {} },
-                    //     // boost: 5,
-                    //     functions: [
-                    //         {
-                    //             filter: { match: { authors: query } },
-                    //             random_score: {},
-                    //             weight: 42
-                    //         },
-                    //         {
-                    //             filter: { match: { title: query } },
-                    //             weight: 23
-                    //         }
-                    //     ],
-                    //     // max_boost: 42,
-                    //     score_mode: "multiply",
-                    //     boost_mode: "multiply",
-                    //     // min_score: 42
-                    // }
-                }
-            }
-        })
-        let { hits, total } = body.hits
-        if (total.value) {
-            hits.map((hit, i) => {
-                let { _id, _score, _source } = hit
-                data[i] = Object.assign({ id: _id, _score }, _source)
-            })
-            return res.status(200).json(data)
+        let data = {
+            error: false,
+            message: []
         }
-        return res.status(404).json(data)
+        let error = {
+            error: true,
+            message: "Bad Request"
+        }
+        try {
+            let { body } = await esClient.search({
+                index: 'books',
+                size: 5,
+                body: {
+                    query: {
+                        query_string: {
+                            fields: ["authors", "title^2"],
+                            query,
+                            minimum_should_match: 3
+                        },
+
+                        // multi_match: {
+                        //     query,
+                        //     fields: ["authors", "title^3"]
+                        // }
+
+                        // function_score: {
+                        //     query: {
+                        //         multi_match: {
+                        //             query,
+                        //             fields: [authors ^ 3, title]
+                        //         }
+                        //     },
+                        //     boost: 5,
+                        //     random_score: {},
+                        //     boost_mode: multiply
+                        // }
+
+                        // function_score: {
+                        //     query: { match_all: {} },
+                        //     // boost: 5,
+                        //     functions: [
+                        //         {
+                        //             filter: { match: { authors: query } },
+                        //             random_score: {},
+                        //             weight: 42
+                        //         },
+                        //         {
+                        //             filter: { match: { title: query } },
+                        //             weight: 23
+                        //         }
+                        //     ],
+                        //     // max_boost: 42,
+                        //     score_mode: "multiply",
+                        //     boost_mode: "multiply",
+                        //     // min_score: 42
+                        // }
+                    }
+                }
+            })
+            let { hits, total } = body.hits
+            if (total.value) {
+                let books = []
+                hits.map((hit, i) => {
+                    let { _id, _score, _source } = hit
+                    books[i] = Object.assign({ id: _id, _score }, _source)
+                })
+                data.message = books
+                return res.status(200).json(data)
+            }
+            return res.status(404).json(data)
+        } catch (err) {
+            console.log("search-err", err)
+            return res.status(404).json(error)
+        }
     })
 }
 // ----------------------------------------------------------------
