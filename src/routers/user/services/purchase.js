@@ -13,7 +13,7 @@ const prepare = (router, route) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
@@ -40,14 +40,14 @@ const prepare = (router, route) => {
                                 esRequest.then(({ body }) => {
                                     if (body.found) {
                                         let { purchased } = body._source
-                                        data.message = [...purchased]
+                                        data.result = [...purchased]
                                         return res.status(200).json(data)
                                     }
-                                    error.message = "Bad Request"
+                                    error.result = "Bad Request"
                                     return res.status(400).json(error)
                                 }).catch(err => {
                                     console.error("error", err)
-                                    error.message = "Bad Request"
+                                    error.result = "Bad Request"
                                     return res.status(400).json(error)
                                 })
                             } else {
@@ -64,7 +64,7 @@ const prepare = (router, route) => {
             }
         }
         else {
-            error.message = "Bad Request"
+            error.result = "Bad Request"
             return res.status(400).json(error)
         }
     })
@@ -74,7 +74,7 @@ const prepare = (router, route) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
@@ -100,7 +100,7 @@ const prepare = (router, route) => {
                                 })
                                 esGetBook.then((bookRes) => {
                                     if (!bookRes.body.found) {
-                                        error.message = "Bad Request"
+                                        error.result = "Bad Request"
                                         return res.status(400).json(error)
                                     }
                                     let { price } = bookRes.body._source
@@ -112,7 +112,7 @@ const prepare = (router, route) => {
                                     })
                                     esGetProile.then((getProfileRes) => {
                                         if (!getProfileRes.body.found) {
-                                            error.message = "Bad Request"
+                                            error.result = "Bad Request"
                                             return res.status(400).json(error)
                                         }
                                         let { balance, purchased } = getProfileRes.body._source
@@ -132,14 +132,14 @@ const prepare = (router, route) => {
                                             })
                                             esUpdateRequest.then((updateProfileRes) => {
                                                 console.log("body-update", updateProfileRes.body)
-                                                data.message = "book purchased successfully"
+                                                data.result = "book purchased successfully"
                                                 data.purchased = newPurchased
                                                 return res.status(200).json(data)
                                             }).catch((err) => {
                                                 console.error("updateProfile-err", err)
                                             })
                                         } else {
-                                            error.message = "Not Acceptable - balance is lower than book price"
+                                            error.result = "Not Acceptable - balance is lower than book price"
                                             return res.status(406).json(error)
                                         }
                                     }).catch(err => {
@@ -162,7 +162,7 @@ const prepare = (router, route) => {
             }
         }
         else {
-            error.message = "Bad Request"
+            error.result = "Bad Request"
             return res.status(400).json(error)
         }
     })

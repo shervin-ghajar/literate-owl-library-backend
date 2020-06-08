@@ -14,11 +14,11 @@ const prepare = (router, route) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
-            message: []
+            result: []
         }
         if (authorization && agent) {
             let authToken = authorization.slice(7, authorization.length)
@@ -42,14 +42,14 @@ const prepare = (router, route) => {
                                 esRequest.then(({ body }) => {
                                     if (body.found) {
                                         let { wishlist } = body._source
-                                        data.message = [...wishlist]
+                                        data.result = [...wishlist]
                                         return res.status(200).json(data)
                                     }
-                                    error.message = "Bad Request"
+                                    error.result = "Bad Request"
                                     return res.status(400).json(error)
                                 }).catch(err => {
                                     console.error("error", err)
-                                    error.message = "Bad Request"
+                                    error.result = "Bad Request"
                                     return res.status(400).json(error)
                                 })
                             } else {
@@ -66,7 +66,7 @@ const prepare = (router, route) => {
             }
         }
         else {
-            error.message = "Bad Request"
+            error.result = "Bad Request"
             return res.status(400).json(error)
         }
     })
@@ -76,7 +76,7 @@ const prepare = (router, route) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
@@ -102,7 +102,7 @@ const prepare = (router, route) => {
                                 })
                                 esGetRequest.then(({ body }) => {
                                     if (!body.found) {
-                                        error.message = "Bad Request"
+                                        error.result = "Bad Request"
                                         return res.status(400).json(error)
                                     }
                                     let { wishlist } = body._source
@@ -119,7 +119,7 @@ const prepare = (router, route) => {
                                     })
                                     esUpdateRequest.then(({ body }) => {
                                         console.log("body-update", body)
-                                        data.message = isWishlisted ? "removed" : "added"
+                                        data.result = isWishlisted ? "removed" : "added"
                                         data.wishlist = newWishList
                                         return res.status(200).json(data)
                                     }).catch((err) => {
@@ -127,7 +127,7 @@ const prepare = (router, route) => {
                                     })
                                 }).catch(err => {
                                     console.error("error", err)
-                                    error.message = "Bad Request"
+                                    error.result = "Bad Request"
                                     return res.status(400).json(error)
                                 })
                             } else {
@@ -144,7 +144,7 @@ const prepare = (router, route) => {
             }
         }
         else {
-            error.message = "Bad Request"
+            error.result = "Bad Request"
             return res.status(400).json(error)
         }
     })

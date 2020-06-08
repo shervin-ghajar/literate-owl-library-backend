@@ -16,11 +16,11 @@ const prepare = (router, route) => {
         let { agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
-            message: []
+            result: []
         }
         try {
             // check if the user already exist
@@ -29,7 +29,7 @@ const prepare = (router, route) => {
                 id: email
             })
             if (body.found) {
-                error.message = "email already exists"
+                error.result = "email already exists"
                 return res.status(409).json(error)
             }
         } catch (error) {
@@ -56,7 +56,7 @@ const prepare = (router, route) => {
                         let token = jwt.sign({ token: key }, config.secret)
                         redisClient.set(key, token)
                         data.token = token
-                        data.message = "user created"
+                        data.result = "user created"
                         return res.status(201).json(data)
                     }
                 } catch (error) {
@@ -91,14 +91,14 @@ const prepare = (router, route) => {
                 }
                 error = {
                     error: true,
-                    message: "username or password is incorrect"
+                    result: "username or password is incorrect"
                 }
                 return res.status(404).json(error) // actually status code must be 403
             }
         } catch (error) {
             error = {
                 error: true,
-                message: "user not found"
+                result: "user not found"
             }
             return res.status(404).json(error)
         }
@@ -109,7 +109,7 @@ const prepare = (router, route) => {
         let data
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         if (authorization && agent) {
             let authToken = authorization.slice(7, authorization.length)
@@ -123,7 +123,7 @@ const prepare = (router, route) => {
                     redisClient.del(decoded.token)
                     data = {
                         error: false,
-                        message: "you successfully loged out"
+                        result: "you successfully loged out"
                     }
                     return res.status(200).json(data)
                 });
@@ -131,14 +131,14 @@ const prepare = (router, route) => {
                 console.error("err", err)
                 error = {
                     error: true,
-                    message: "token unauthorized"
+                    result: "token unauthorized"
                 }
                 return res.status(401).json(error)
             }
         } else {
             error = {
                 error: true,
-                message: "Bad Request"
+                result: "Bad Request"
             }
             return res.status(400).json(error)
         }

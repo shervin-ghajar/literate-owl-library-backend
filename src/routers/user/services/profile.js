@@ -13,7 +13,7 @@ const prepare = (router, route) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
@@ -40,7 +40,7 @@ const prepare = (router, route) => {
                                 esRequest.then(({ body }) => {
                                     if (body.found) {
                                         let { username, email, password, balance, wishlist, purchased } = body._source
-                                        data.message = {
+                                        data.result = {
                                             username,
                                             email,
                                             password,
@@ -50,11 +50,11 @@ const prepare = (router, route) => {
                                         }
                                         return res.status(200).json(data)
                                     }
-                                    error.message = "Not Content"
+                                    error.result = "Not Content"
                                     return res.status(204).json(error)
                                 }).catch(err => {
                                     console.error("error", err)
-                                    error.message = "Bad Request"
+                                    error.result = "Bad Request"
                                     return res.status(400).json(error)
                                 })
                             } else {
@@ -71,7 +71,7 @@ const prepare = (router, route) => {
             }
         }
         else {
-            error.message = "Bad Request"
+            error.result = "Bad Request"
             return res.status(400).json(error)
         }
     })
@@ -81,7 +81,7 @@ const prepare = (router, route) => {
         let { authorization, agent } = req.headers
         let error = {
             error: true,
-            message: "token unauthorized"
+            result: "token unauthorized"
         }
         let data = {
             error: false,
@@ -112,7 +112,7 @@ const prepare = (router, route) => {
                                 })
                                 esUpdateRequest.then(({ body }) => {
                                     console.log("body-update", body)
-                                    data.message = "profile updated"
+                                    data.result = "profile updated"
                                     return res.status(200).json(data)
                                 }).catch((err) => {
                                     console.error("error-update", err)
@@ -131,7 +131,7 @@ const prepare = (router, route) => {
             }
         }
         else {
-            error.message = "Bad Request"
+            error.result = "Bad Request"
             return res.status(400).json(error)
         }
     })

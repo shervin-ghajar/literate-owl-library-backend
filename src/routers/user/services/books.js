@@ -8,11 +8,11 @@ const prepare = (router, route) => {
     router.get(`${route}`, async (req, res) => {
         let data = {
             error: false,
-            message: []
+            result: []
         }
         let error = {
             error: true,
-            message: "Bad Request"
+            result: "Bad Request"
         }
         try {
             let { body } = await esClient.search({
@@ -31,7 +31,7 @@ const prepare = (router, route) => {
                 let { _id, _source } = hit
                 books[i] = Object.assign({ id: _id }, _source)
             })
-            data.message = books
+            data.result = books
             return res.status(200).json(data)
         } catch (err) {
             console.log("search-err", err)
@@ -42,11 +42,11 @@ const prepare = (router, route) => {
     router.get(`${route}/book/:bookId`, async (req, res) => {
         let data = {
             error: false,
-            message: []
+            result: []
         }
         let error = {
             error: true,
-            message: "Bad Request"
+            result: "Bad Request"
         }
         let { bookId } = req.params
         try {
@@ -57,10 +57,10 @@ const prepare = (router, route) => {
             let { _id, _source } = body
             if (body.found) {
                 let book = Object.assign({ id: _id }, _source)
-                data.message = book
+                data.result = book
                 return res.status(200).json(data)
             }
-            error.message = "book not found"
+            error.result = "book not found"
             return res.status(404).json(error)
         } catch (err) {
             console.log("get-err", err)
@@ -72,11 +72,11 @@ const prepare = (router, route) => {
         let { ids } = req.body
         let data = {
             error: false,
-            message: []
+            result: []
         }
         let error = {
             error: true,
-            message: "Bad Request"
+            result: "Bad Request"
         }
         try {
             let { body } = await esClient.mget({
@@ -92,10 +92,10 @@ const prepare = (router, route) => {
                     let { _id, _source } = doc
                     books[i] = Object.assign({ id: _id }, _source)
                 })
-                data.message = books
+                data.result = books
                 return res.status(200).json(data)
             }
-            error.message = "book not found"
+            error.result = "book not found"
             return res.status(404).json(error)
         } catch (err) {
             console.log("mget-err", err)
@@ -107,11 +107,11 @@ const prepare = (router, route) => {
         let { genres } = req.body
         let data = {
             error: false,
-            message: []
+            result: []
         }
         let error = {
             error: true,
-            message: "Bad Request"
+            result: "Bad Request"
         }
         let query = genres.map(genre => {
             return (
@@ -136,7 +136,7 @@ const prepare = (router, route) => {
                 let { _id, _source } = hit
                 books[i] = Object.assign({ id: _id }, _source)
             })
-            data.message = books
+            data.result = books
             return res.status(200).json(data)
         } catch (err) {
             console.log("genre-err", err)
@@ -148,11 +148,11 @@ const prepare = (router, route) => {
         let { query } = req.body
         let data = {
             error: false,
-            message: []
+            result: []
         }
         let error = {
             error: true,
-            message: "Bad Request"
+            result: "Bad Request"
         }
         try {
             let { body } = await esClient.search({
@@ -212,7 +212,7 @@ const prepare = (router, route) => {
                     let { _id, _score, _source } = hit
                     books[i] = Object.assign({ id: _id, _score }, _source)
                 })
-                data.message = books
+                data.result = books
                 return res.status(200).json(data)
             }
             return res.status(404).json(data)
