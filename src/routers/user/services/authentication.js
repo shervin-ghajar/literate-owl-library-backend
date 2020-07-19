@@ -1,4 +1,4 @@
-// "use strict";
+"use strict";
 // ----------------------------------------------------------------
 import { config } from '../../../config';
 import { Client } from '@elastic/elasticsearch';
@@ -7,7 +7,7 @@ import redis from 'redis';
 const redisClient = redis.createClient();
 import jwt from 'jsonwebtoken';
 // ----------------------------------------------------------------
-const staticToken = "QclJtQLTjrmiDARMFnq73f8F0tQ5C7wT" //Blowfish /https://www.tools4noobs.com/online_tools/encrypt/
+//Blowfish /https://www.tools4noobs.com/online_tools/encrypt/
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
     // ------------------------------Signup------------------------------

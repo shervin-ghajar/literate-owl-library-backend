@@ -45,18 +45,18 @@ services:
     volumes:
       - redis-data:/data
   #lol
-  lol:
-    image: lol:1.0.0
-    container_name: lol
-    command: ["npm", "start"]
-    hostname: lol
-    ports:
-      - 3000:3000
-    networks:
-      - service-network
-    depends_on:
-      - elasticsearch
-      - redis
+  # lol:
+  #   image: lol:1.0.0
+  #   container_name: lol
+  #   command: ["npm", "start"]
+  #   hostname: lol
+  #   ports:
+  #     - 3000:3000
+  #   networks:
+  #     - service-network
+  #   depends_on:
+  #     - elasticsearch
+  #     - redis
 volumes:
   redis-data:
     driver: local

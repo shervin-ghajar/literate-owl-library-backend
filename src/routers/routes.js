@@ -22,7 +22,7 @@ const listen = () => {
     // wrong routes
     app.all('*', function (req, res) {
         let error = {
-            error: false,
+            error: true,
             message: "route not found"
         }
         res.status(404).json(error)
