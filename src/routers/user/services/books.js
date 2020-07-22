@@ -1,7 +1,5 @@
 "use strict";
 // ----------------------------------------------------------------
-import { Client } from '@elastic/elasticsearch';
-const esClient = new Client({ node: 'http://localhost:9200' })
 import { getAllBooks, getBookById, getBooksByIds, getBooksByGenre, getBooksBySearch } from '../../../database/elasticsearch/services/books';
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
