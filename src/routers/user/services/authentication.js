@@ -1,11 +1,5 @@
 "use strict";
 // ----------------------------------------------------------------
-import { config } from '../../../config';
-import { Client } from '@elastic/elasticsearch';
-const esClient = new Client({ node: 'http://localhost:9200' });
-import redis from 'redis';
-const redisClient = redis.createClient();
-import jwt from 'jsonwebtoken';
 import { getProfile, createProfile } from '../../../database/elasticsearch/services/profile';
 import { tokenGenerator, deleteToken } from '../../../database/redis/services/token';
 // ----------------------------------------------------------------
