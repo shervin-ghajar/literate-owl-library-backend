@@ -1,7 +1,7 @@
 "use strict";
 // ----------------------------------------------------------------
 import { getProfile, updateProfile } from '../../../database/elasticsearch/services/profile';
-import { tokenValidator } from '../../../database/redis/services/token_validator';
+import { tokenValidator } from '../../../database/redis/services/token';
 // ----------------------------------------------------------------
 const prepare = (router, route) => {
     // --------------------------Get Profile-----------------------

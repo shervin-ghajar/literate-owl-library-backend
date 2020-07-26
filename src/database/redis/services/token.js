@@ -3,6 +3,18 @@ const redisClient = redis.createClient();
 import jwt from 'jsonwebtoken';
 import { config } from '../../../config';
 //-----------------------------------------------------------------------------------------------
+async function tokenGenerator(agent, userId) {
+    try {
+        let key = `${userId}_${agent}`
+        let token = jwt.sign({ token: key }, config.secret)
+        redisClient.set(key, token)
+        return token
+    } catch (error) {
+        throw error
+    }
+}
+//-----------------------------------------------------------------------------------------------
+
 async function tokenValidator(authorization, agent, userId, error) {
     try {
         if (authorization && agent) {
@@ -35,4 +47,24 @@ async function tokenValidator(authorization, agent, userId, error) {
     }
 }
 //-----------------------------------------------------------------------------------------------
-export { tokenValidator }
+function deleteToken(authorization, agent, response, error) {
+    try {
+        if (authorization && agent) {
+            let authToken = authorization.slice(7, authorization.length)
+            jwt.verify(authToken, config.secret, (jwtErr, decoded) => {
+                if (!(decoded && 'token' in decoded)) {
+                    console.error("jwtErr", jwtErr)
+                    error(401)
+                }
+                redisClient.del(decoded.token)
+                response(true)
+            })
+        } else {
+            error(400)
+        }
+    } catch (error) {
+        throw error
+    }
+}
+//-----------------------------------------------------------------------------------------------
+export { tokenValidator, tokenGenerator, deleteToken }
