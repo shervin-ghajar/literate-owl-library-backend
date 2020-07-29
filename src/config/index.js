@@ -1,5 +1,3 @@
-import { JsonWebTokenError } from "jsonwebtoken"
-
 const config = {
     "secret": "Literate_Owl_Library_Secret",
     "redis": {
