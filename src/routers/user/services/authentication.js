@@ -28,9 +28,8 @@ const prepare = (router, route) => {
         }).catch(getProfileError => {
             if ("statusCode" in getProfileError && getProfileError.statusCode == 404) {
                 // create user
-                createProfile(agent, email, username, password).then(response => {
-                    data.token = response
-                    data.result = "user created"
+                return createProfile(agent, email, username, password).then(token => {
+                    data.result = { token }
                     return res.status(201).json(data)
                 }).catch(err => {
                     console.log(err)
@@ -42,10 +41,17 @@ const prepare = (router, route) => {
         })
     })
     // --------------------------Login-----------------------
-    router.get(`${route}/login`, (req, res) => {
+    router.post(`${route}/login`, (req, res) => {
         let { agent } = req.headers
         let { email, password } = req.body
-        let error, data
+        let error = {
+            error: true,
+            result: "token unauthorized"
+        }
+        let data = {
+            error: false,
+            result: []
+        }
         // validate email
         // check if the email exist
         getProfile(email).then(response => {
@@ -53,27 +59,24 @@ const prepare = (router, route) => {
             if (response.password !== password) {
                 error = {
                     error: true,
-                    result: "username or password is incorrect"
+                    result: "user not found!"
                 }
-                return res.status(403).json(error) // actually status code must be 403
+                return res.status(404).send(error) // actually status code must be 403
             }
             tokenGenerator(agent, response.email).then(token => {
-                data = {
-                    error: false,
-                    token
-                }
+                data.result = { token }
                 return res.status(200).json(data)
             }).catch(err => {
                 console.log("tokenGeneratorError", err)
                 return;
             })
-        }).catch(error => {
-            console.log("getProfileError", error)
+        }).catch(err => {
+            console.log("getProfileError", err)
             error = {
                 error: true,
                 result: "user not found"
             }
-            return res.status(404).json(error)
+            return res.status(404).send(error)
         })
     })
     // --------------------------Logout-----------------------

@@ -21,6 +21,7 @@ const listen = () => {
     app.use(`${BaseDomain}/user`, userRouter())
     // wrong routes
     app.all('*', function (req, res) {
+        console.log("---route not found---")
         let error = {
             error: true,
             message: "route not found"

@@ -23,6 +23,7 @@ async function tokenValidator(authorization, agent, userId, error) {
                 if (!(decoded && 'token' in decoded)) {
                     console.error("jwtErr", jwtErr)
                     error(401)
+                    return;
                 }
                 redisClient.get(decoded.token, (err, reply) => {
                     if (reply) {
@@ -47,14 +48,14 @@ async function tokenValidator(authorization, agent, userId, error) {
     }
 }
 //-----------------------------------------------------------------------------------------------
-function deleteToken(authorization, agent, response, error) {
+async function deleteToken(authorization, agent, response, error) {
     try {
         if (authorization && agent) {
             let authToken = authorization.slice(7, authorization.length)
             jwt.verify(authToken, config.secret, (jwtErr, decoded) => {
+                console.error("jwtErr", jwtErr, decoded)
                 if (!(decoded && 'token' in decoded)) {
-                    console.error("jwtErr", jwtErr)
-                    error(401)
+                    return error(401)
                 }
                 redisClient.del(decoded.token)
                 response(true)

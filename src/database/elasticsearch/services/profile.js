@@ -50,11 +50,11 @@ async function updateProfile(userId, username, password) {
     }
 }
 //------------------------------------------CREATE PROFILE----------------------------------------
-async function createProfile(agent, userId, username, password) {
+async function createProfile(agent, email, username, password) {
     try {
         const { body } = await esClient.index({
             index,
-            id: userId,
+            id: email,
             body: {
                 username,
                 email,
@@ -66,7 +66,7 @@ async function createProfile(agent, userId, username, password) {
         })
         await esClient.indices.refresh({ index: 'profile' })
         if (body.result == 'created') {
-            tokenGenerator(agent, _id).then(token => {
+            return tokenGenerator(agent, email).then(token => {
                 return token
             }).catch(err => {
                 console.log("tokenGeneratorError", err)
