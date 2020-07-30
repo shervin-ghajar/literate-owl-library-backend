@@ -54,17 +54,24 @@ const prepare = (router, route) => {
         }
         // validate email
         // check if the email exist
-        getProfile(email).then(response => {
-            // console.log("response", response, response.password !== password)
-            if (response.password !== password) {
+        getProfile(email).then(profile => {
+            // console.log("profile", profile, profile.password !== password)
+            if (profile.password !== password) {
                 error = {
                     error: true,
                     result: "user not found!"
                 }
-                return res.status(404).send(error) // actually status code must be 403
+                return res.status(404).json(error) // actually status code must be 403
             }
-            tokenGenerator(agent, response.email).then(token => {
-                data.result = { token }
+            tokenGenerator(agent, profile.email).then(token => {
+                let userProfile = {
+                    username: profile.username,
+                    email: profile.email,
+                    balance: profile.balance,
+                    wishlist: profile.wishlist,
+                    purchased: profile.purchased
+                }
+                data.result = { token, profile: userProfile }
                 return res.status(200).json(data)
             }).catch(err => {
                 console.log("tokenGeneratorError", err)
@@ -76,7 +83,7 @@ const prepare = (router, route) => {
                 error: true,
                 result: "user not found"
             }
-            return res.status(404).send(error)
+            return res.status(404).json(error)
         })
     })
     // --------------------------Logout-----------------------

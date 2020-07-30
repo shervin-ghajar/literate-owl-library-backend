@@ -15,9 +15,16 @@ const prepare = (router, route) => {
             error: false,
         }
         tokenValidator(authorization, agent, userId => {
-            getProfile(userId).then(response => {
-                if (response) {
-                    data.result = response
+            getProfile(userId).then(profile => {
+                if (profile) {
+                    let userProfile = {
+                        username: profile.username,
+                        email: profile.email,
+                        balance: profile.balance,
+                        wishlist: profile.wishlist,
+                        purchased: profile.purchased
+                    }
+                    data.result = userProfile
                     return res.status(200).json(data)
                 }
                 error.result = "Not Content"
