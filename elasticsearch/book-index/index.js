@@ -24,7 +24,7 @@ fs.createReadStream(book_csv)
                 uniqueGenres.some(element => element == genre) ? null : uniqueGenres.push(genre)
             })
             let price = getRandomPrice(50)
-            let year = getRandomYear(1995, 2020)
+            let year = getRandomYear(1995, 2021)
             bookData[index] = Object.assign({}, { authors, title: book_title, desc: book_desc, genres: uniqueGenres, pages, rating: parseFloat(book_rating), rating_count: parseInt(book_rating_count), price, year, image_url })
         })
         let dataset = []

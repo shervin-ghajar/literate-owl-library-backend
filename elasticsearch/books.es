@@ -77,12 +77,10 @@ PUT books
                 "type": "integer"
             },
             "price": {
-                "type": "keyword",
-                "index": false
+                "type": "keyword"
             },
             "year": {
-                "type": "integer",
-                "index": false
+                "type": "integer"
             },
             "image_url": {
                 "type": "keyword",
@@ -104,6 +102,15 @@ GET books/_search
         }
   }
 }
+
+GET books/_msearch 
+{}
+{"query": {"term":{"year":2020}},"size" : 1,"sort" : [{"rating_count" : {"order" : "desc"}},{"rating" : {"order" : "desc"}}]}
+{}
+{"query": {"term":{"price":0}},"size" : 1,"sort" : [{"rating_count" : {"order" : "desc"}},{"rating" : {"order" : "desc"}}]}
+{}
+{"query": {"match_all": {}},"size" : 1,"sort" : [{"rating_count" : {"order" : "desc"}},{"rating" : {"order" : "desc"}}]}
+
 
 GET books/_doc/7ZjoPXIBk6_coDgKK5Nq
 
