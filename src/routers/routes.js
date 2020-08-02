@@ -19,12 +19,15 @@ const listen = () => {
     app.use(bodyParser.json({ limit: "1mb" }));
     // routes
     app.use(`${BaseDomain}/user`, userRouter())
-    // wrong routes
-    app.all('*', function (req, res) {
+    // images
+    app.use('/lol/book/image', express.static('../images'))
+
+    // wrong 
+    app.all('*', (req, res) => {
         console.log("---route not found---")
         let error = {
             error: true,
-            message: "route not found"
+            result: "route not found"
         }
         res.status(404).json(error)
     })

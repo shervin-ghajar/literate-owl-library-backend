@@ -13,7 +13,7 @@ fs.createReadStream(book_csv)
     .on('data', data => data_set.push(data))
     .on('end', async () => {
         data_set.map((result, index) => {
-            let { book_authors, book_title, genres, book_desc, book_pages, book_rating, book_rating_count, image_url } = result
+            let { book_authors, book_title, genres, book_desc, book_pages, book_rating, book_rating_count } = result
             let authors = book_authors.split("|")
             let pages = book_pages.match(/\d+/g)
             pages = pages ? parseInt(pages[0]) : getRandomYear(200, 800)
@@ -25,6 +25,15 @@ fs.createReadStream(book_csv)
             })
             let price = getRandomPrice(50)
             let year = getRandomYear(1995, 2021)
+            let image_url = null
+            try {
+                if (fs.existsSync(`../images/${index}.jpg`)) {
+                    image_url = `/lol/book/image/${index}.jpg`
+                }
+            } catch (err) {
+                image_url = null
+                console.log(index, "image null")
+            }
             bookData[index] = Object.assign({}, { authors, title: book_title, desc: book_desc, genres: uniqueGenres, pages, rating: parseFloat(book_rating), rating_count: parseInt(book_rating_count), price, year, image_url })
         })
         let dataset = []

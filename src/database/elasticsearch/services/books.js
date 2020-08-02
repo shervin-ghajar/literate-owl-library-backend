@@ -8,11 +8,11 @@ async function getAllBooks() {
         let { body } = await esClient.msearch({
             body: [
                 { index },
-                { "query": { "term": { "year": 2020 } }, "size": 3, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { "query": { "term": { "year": 2020 } }, "size": 10, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
                 { index },
-                { "query": { "term": { "price": 0 } }, "size": 1, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { "query": { "term": { "price": 0 } }, "size": 10, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
                 { index },
-                { "query": { "match_all": {} }, "size": 1, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { "query": { "match_all": {} }, "size": 10, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
             ]
         })
         let new_books = []

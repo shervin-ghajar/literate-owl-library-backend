@@ -88,12 +88,14 @@ const prepare = (router, route) => {
     })
     // --------------------------Logout-----------------------
     router.post(`${route}/logout`, (req, res) => {
+        console.warn("object", req.headers.agent)
         let { authorization, agent } = req.headers
         let data
         let error = {
             error: true,
             result: "token unauthorized"
         }
+        console.warn(authorization, agent)
         deleteToken(authorization, agent, response => {
             if (response) {
                 data = {

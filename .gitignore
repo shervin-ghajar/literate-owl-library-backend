@@ -110,5 +110,7 @@ temp/
 
 # Custom Ignorance
 result.json
+# .jpg 
+# images/
 
 # End of https://www.gitignore.io/api/node
