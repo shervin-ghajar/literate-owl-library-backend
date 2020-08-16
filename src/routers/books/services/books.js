@@ -74,7 +74,7 @@ const prepare = (router, route) => {
             return res.status(401).json(error)
         })
     })
-    // ---------------------------------Get Books by Id-------------------------------
+    // ---------------------------------Get Books by Ids-------------------------------
     router.get(`${route}/ids`, (req, res) => {
         let { authorization, agent } = req.headers
         let { ids } = req.body

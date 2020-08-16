@@ -8,11 +8,11 @@ async function getAllBooks() {
         let { body } = await esClient.msearch({
             body: [
                 { index },
-                { "query": { "term": { "year": 2020 } }, "size": 10, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { "query": { "term": { "year": 2020 } }, "size": 15, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
                 { index },
-                { "query": { "term": { "price": 0 } }, "size": 10, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { "query": { "term": { "price": 0 } }, "size": 15, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
                 { index },
-                { "query": { "match_all": {} }, "size": 10, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { "query": { "match_all": {} }, "size": 15, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
             ]
         })
         let new_books = []
@@ -248,6 +248,51 @@ async function getBooksByFilters(query) {
         return books
     } catch (err) {
         throw err
+    }
+}
+//--------------------------------------------------------------------------------------------
+async function getNewBooks() {
+    try {
+        let { body } = await esClient.msearch({
+            body: [
+                { index },
+                { "query": { "term": { "year": 2020 } }, "size": 15, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { index },
+                { "query": { "term": { "price": 0 } }, "size": 15, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+                { index },
+                { "query": { "match_all": {} }, "size": 15, "sort": [{ "rating_count": { "order": "desc" } }, { "rating": { "order": "desc" } }] },
+            ]
+        })
+        let new_books = []
+        let free_books = []
+        let popular_books = []
+        let { responses } = body
+        responses.map((response, i) => {
+            let { hits } = response.hits
+            switch (i) {
+                case 0:
+                    hits.map((hit, i) => {
+                        let { _id, _source } = hit
+                        new_books[i] = Object.assign({ id: _id }, _source)
+                    })
+                    break;
+                case 1:
+                    hits.map((hit, i) => {
+                        let { _id, _source } = hit
+                        free_books[i] = Object.assign({ id: _id }, _source)
+                    })
+                    break;
+                case 2:
+                    hits.map((hit, i) => {
+                        let { _id, _source } = hit
+                        popular_books[i] = Object.assign({ id: _id }, _source)
+                    })
+                    break;
+            }
+        })
+        return { new_books, free_books, popular_books }
+    } catch (error) {
+        throw error
     }
 }
 //--------------------------------------------------------------------------------------------

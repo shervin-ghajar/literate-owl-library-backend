@@ -134,6 +134,7 @@ const prepare = (router, route) => {
                                                 console.log("body-update", updateProfileRes.body)
                                                 data.result = "book purchased successfully"
                                                 data.purchased = newPurchased
+                                                data.balance = newBalance
                                                 return res.status(200).json(data)
                                             }).catch((err) => {
                                                 console.error("updateProfile-err", err)

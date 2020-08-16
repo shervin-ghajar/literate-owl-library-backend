@@ -3,45 +3,14 @@ PUT books
     "settings": {
         "index": {
             "number_of_shards": 1,
-            "number_of_replicas": 0,
-            "max_ngram_diff": 2
+            "number_of_replicas": 0
         },
         "analysis": {
-            "filter": {
-                "english_stop": {
-                    "type": "stop",
-                    "stopwords": "_english_"
-                },
-                "english_stemmer": {
-                    "type": "stemmer",
-                    "language": "english"
-                },
-                "english_possessive_stemmer": {
-                    "type": "stemmer",
-                    "language": "possessive_english"
-                },
-                "ngram": {
-                  "type": "ngram",
-                  "min_gram": 2,
-                  "max_gram": 4,
-                  "token_chars": [
-                        "letter",
-                        "digit"
-                    ]
-                },
-                "edge_ngram": {
-                  "type": "edge_ngram",
-                  "min_gram": 2,
-                  "max_gram": 16
-                }
-            },
             "analyzer": {
                 "base_analyzer": {
                     "tokenizer": "standard",
                     "filter": [
-                      "lowercase",
-                      "ngram",
-                      "edge_ngram"
+                      "lowercase"
                     ]
                 }
             }
@@ -93,11 +62,11 @@ PUT books
 GET books/_doc/YxdIrnMBDTDAkNztjqdM
 GET books/_search
 {
-  "size" : 10,
+  "size" : 2,
   "query": {
     "match": {
           "authors": {
-            "query": "jane"
+            "query": "rowl"
           }
         }
   }

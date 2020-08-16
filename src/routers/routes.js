@@ -5,6 +5,8 @@ import http from 'http';
 import bodyParser from 'body-parser';
 // ----------------------------Routes-----------------------------
 import userRouter from './user';
+import booksRouter from './books';
+
 // import authRouter from './authentication';
 // ----------------------------------------------------------------
 const BaseDomain = "/lol/api"
@@ -18,9 +20,9 @@ const listen = () => {
     app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
     app.use(bodyParser.json({ limit: "1mb" }));
     // routes
-    app.use(`${BaseDomain}/user`, userRouter())
-    // images
-    app.use('/lol/book/image', express.static('../images'))
+    app.use(`${BaseDomain}/user`, userRouter()) //user route
+    app.use(`${BaseDomain}/book`, booksRouter()) // books route
+    app.use(`${BaseDomain}/book/image`, express.static('../images')) // book images
 
     // wrong 
     app.all('*', (req, res) => {
