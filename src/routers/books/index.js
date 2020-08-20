@@ -7,7 +7,8 @@ import booksRoutes from './services/books';
 const booksRouter = () => {
     let router = express()
     // prepare routes
-    booksRoutes.prepare(router, "/books")
+    booksRoutes.prepare(router)
+
 
     return router;
 }

@@ -21,8 +21,8 @@ const listen = () => {
     app.use(bodyParser.json({ limit: "1mb" }));
     // routes
     app.use(`${BaseDomain}/user`, userRouter()) //user route
-    app.use(`${BaseDomain}/book`, booksRouter()) // books route
-    app.use(`${BaseDomain}/book/image`, express.static('../images')) // book images
+    app.use(`${BaseDomain}/books`, booksRouter()) // books route
+    app.use(`${BaseDomain}/books/book/image`, express.static('../images')) // book image
 
     // wrong 
     app.all('*', (req, res) => {

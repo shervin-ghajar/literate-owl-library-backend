@@ -28,7 +28,7 @@ fs.createReadStream(book_csv)
             let image_url = null
             try {
                 if (fs.existsSync(`../images/${index}.jpg`)) {
-                    image_url = `/lol/book/image/${index}.jpg`
+                    image_url = `/lol/api/books/book/image/${index}.jpg`
                 }
             } catch (err) {
                 image_url = null

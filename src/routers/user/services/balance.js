@@ -19,7 +19,6 @@ const prepare = (router, route) => {
         let data = {
             error: false,
         }
-        console.log(!isNaN(chargeAmount))
         if (authorization && agent && chargeAmount && !isNaN(chargeAmount)) {
             let authToken = authorization.slice(7, authorization.length)
             try {
