@@ -48,6 +48,78 @@ async function getAllBooks() {
     }
 }
 //--------------------------------------------------------------------------------------------
+async function getScrollableBooks(queryType, scrollId, genres) {
+    let query = {}
+    console.log(genres)
+    switch (queryType) {
+        case 'new':
+            query = { term: { year: 2020 } }
+            break;
+        case 'free':
+            query = { term: { price: 0 } }
+            break;
+        case 'popular':
+            query = { match_all: {} }
+            break;
+        case 'genres':
+            query = {
+                bool: {
+                    must: genres.map(genre => {
+                        return (
+                            { match: { genres: genre } }
+                        )
+                    })
+                }
+            }
+            break;
+    }
+    console.log(query)
+    let { body } = {}
+    try {
+        !scrollId ?
+            { body } = await esClient.search({
+                index,
+                size: 20,
+                scroll: '60s',
+                body: {
+                    query,
+                    sort: [
+                        {
+                            "rating_count": {
+                                "order": "desc"
+                            }
+                        },
+                        {
+                            "rating": {
+                                "order": "desc"
+                            }
+                        }
+                    ]
+                }
+            })
+            :
+            { body } = await esClient.scroll({
+                scrollId,
+                scroll: '15s'
+            })
+
+        let { hits, total } = body.hits
+        let books = []
+        let response = []
+        if (total.value) {
+            hits.map((hit, i) => {
+                let { _id, _score, _source } = hit
+                books[i] = Object.assign({ id: _id, _score }, _source)
+            })
+        }
+        response = { scrollId: body._scroll_id, books }
+        console.log(response)
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+//--------------------------------------------------------------------------------------------
 async function getBookById(id) {
     try {
         let { body } = await esClient.get({
@@ -86,11 +158,6 @@ async function getBooksByIds(ids) {
 }
 //--------------------------------------------------------------------------------------------
 async function getBooksByGenre(genres) {
-    let query = genres.map(genre => {
-        return (
-            { match: { genres: genre } }
-        )
-    })
     try {
         let { body } = await esClient.search({
             index,
@@ -300,6 +367,7 @@ async function getNewBooks() {
 
 export {
     getAllBooks,
+    getScrollableBooks,
     getBookById,
     getBooksByIds,
     getBooksByGenre,

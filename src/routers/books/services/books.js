@@ -1,6 +1,6 @@
 "use strict";
 // ----------------------------------------------------------------
-import { getAllBooks, getBookById, getBooksByIds, getBooksByGenre, getBooksBySearch } from '../../../database/elasticsearch/services/books';
+import { getAllBooks, getScrollableBooks, getBookById, getBooksByIds, getBooksByGenre, getBooksBySearch } from '../../../database/elasticsearch/services/books';
 import { tokenValidator } from '../../../database/redis/services/token';
 // ----------------------------------------------------------------
 const prepare = (router) => {
@@ -39,45 +39,11 @@ const prepare = (router) => {
             return res.status(401).json(error)
         })
     })
-    // ---------------------------------Get Book by Id-------------------------------
-    // router.get(`/book/:bookId`, (req, res) => {
-    //     let { authorization, agent } = req.headers
-    //     let { bookId } = req.params
-    //     let data = {
-    //         error: false,
-    //         result: []
-    //     }
-    //     let error = {
-    //         error: true,
-    //         result: "Bad Request"
-    //     }
-    //     tokenValidator(authorization, agent, userId => {
-    //         getBookById(bookId).then(response => {
-    //             data.result = response
-    //             return res.status(200).json(data)
-    //         }).catch(err => {
-    //             return res.status(400).json(error)
-    //         })
-    //     }, err => {
-    //         switch (err) {
-    //             case 400:
-    //                 error.result = "Bad Request"
-    //                 return res.status(400).json(error)
-    //             case 401:
-    //                 console.error("catch-err", err)
-    //                 error.result = "token unauthorized"
-    //                 return res.status(401).json(error)
-    //         }
-    //     }).catch(err => {
-    //         console.error("catch-err", err)
-    //         error.result = "token unauthorized"
-    //         return res.status(401).json(error)
-    //     })
-    // })
-    // ---------------------------------Get Books by Ids-------------------------------
-    router.get("/ids", (req, res) => {
+    // ------------------------------Get Scrollable Books----------------------------------
+    router.post("/scroll", (req, res) => {
         let { authorization, agent } = req.headers
-        let { ids } = req.body
+        let { queryType, scrollId, genres } = req.body
+        console.warn(genres)
         let data = {
             error: false,
             result: []
@@ -86,7 +52,44 @@ const prepare = (router) => {
             error: true,
             result: "Bad Request"
         }
-        tokenValidator(authorization, agent, userId => {
+        tokenValidator(authorization, agent, () => {
+            getScrollableBooks(queryType, scrollId, genres).then(response => {
+                data.result = response
+                return res.status(200).json(data)
+            }).catch(err => {
+                console.log("search-err", err)
+                return res.status(400).json(error)
+            })
+        }, err => {
+            switch (err) {
+                case 400:
+                    error.result = "Bad Request"
+                    return res.status(400).json(error)
+                case 401:
+                    console.error("catch-err", err)
+                    error.result = "token unauthorized"
+                    return res.status(401).json(error)
+            }
+        }).catch(err => {
+            console.error("catch-err", err)
+            error.result = "token unauthorized"
+            return res.status(401).json(error)
+        })
+    })
+    // ---------------------------------Get Books by Ids-------------------------------
+    router.post("/ids", (req, res) => {
+        let { authorization, agent } = req.headers
+        let { ids } = req.body
+        console.warn(ids)
+        let data = {
+            error: false,
+            result: []
+        }
+        let error = {
+            error: true,
+            result: "Bad Request"
+        }
+        tokenValidator(authorization, agent, () => {
             getBooksByIds(ids).then(response => {
                 data.result = response
                 return res.status(200).json(data)

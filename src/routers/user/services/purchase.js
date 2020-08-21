@@ -132,9 +132,10 @@ const prepare = (router, route) => {
                                             })
                                             esUpdateRequest.then((updateProfileRes) => {
                                                 console.log("body-update", updateProfileRes.body)
-                                                data.result = "book purchased successfully"
-                                                data.purchased = newPurchased
-                                                data.balance = newBalance
+                                                data.result = {
+                                                    purchased: newPurchased,
+                                                    balance: newBalance
+                                                }
                                                 return res.status(200).json(data)
                                             }).catch((err) => {
                                                 console.error("updateProfile-err", err)

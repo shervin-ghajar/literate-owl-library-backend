@@ -12,6 +12,7 @@ const prepare = (router, route) => {
     router.post(`${route}/:chargeAmount`, (req, res) => {
         let { chargeAmount } = req.params
         let { authorization, agent } = req.headers
+        console.warn(chargeAmount)
         let error = {
             error: true,
             result: "token unauthorized"
@@ -58,8 +59,7 @@ const prepare = (router, route) => {
                                     })
                                     esUpdateRequest.then(({ body }) => {
                                         console.log("body-update", body)
-                                        data.result = "balance charged"
-                                        data.balance = newBalance
+                                        data.result = { balance: newBalance }
                                         return res.status(200).json(data)
                                     }).catch((err) => {
                                         console.error("error-update", err)
