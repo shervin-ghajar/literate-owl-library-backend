@@ -190,7 +190,7 @@ async function getBooksBySearch(query) {
     try {
         let { body } = await esClient.search({
             index,
-            size: 5,
+            size: 15,
             body: {
                 query: {
                     query_string: {

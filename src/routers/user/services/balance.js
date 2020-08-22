@@ -46,8 +46,8 @@ const prepare = (router, route) => {
                                         return res.status(400).json(error)
                                     }
                                     let { balance } = body._source
-                                    newBalance = Number(balance) + Math.abs(Number(chargeAmount.trim()))
-                                    // newBalance = Number(balance) + Number(chargeAmount.trim())
+                                    newBalance = (Number(balance) + Math.abs(Number(chargeAmount.trim()))).toFixed(2)
+                                    newBalance = Number(newBalance)
                                     const esUpdateRequest = esClient.update({
                                         index: 'profile',
                                         id: userId,

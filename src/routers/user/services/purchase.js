@@ -117,6 +117,7 @@ const prepare = (router, route) => {
                                         }
                                         let { balance, purchased } = getProfileRes.body._source
                                         let newBalance = Number(balance) - Number(price)
+                                        newBalance = Number(newBalance.toFixed(2))
                                         let newPurchased = [bookId, ...purchased]
                                         console.log(balance, price, newBalance)
                                         if (newBalance >= 0) {

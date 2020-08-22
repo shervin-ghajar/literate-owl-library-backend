@@ -15,29 +15,29 @@ const prepare = (router) => {
             error: true,
             result: "Bad Request"
         }
-        tokenValidator(authorization, agent, userId => {
-            getAllBooks().then(response => {
-                data.result = response
-                return res.status(200).json(data)
-            }).catch(err => {
-                console.log("search-err", err)
-                return res.status(400).json(error)
-            })
-        }, err => {
-            switch (err) {
-                case 400:
-                    error.result = "Bad Request"
-                    return res.status(400).json(error)
-                case 401:
-                    console.error("catch-err", err)
-                    error.result = "token unauthorized"
-                    return res.status(401).json(error)
-            }
+        getAllBooks().then(response => {
+            data.result = response
+            return res.status(200).json(data)
         }).catch(err => {
-            console.error("catch-err", err)
-            error.result = "token unauthorized"
-            return res.status(401).json(error)
+            console.log("search-err", err)
+            return res.status(400).json(error)
         })
+        // tokenValidator(authorization, agent, userId => {
+        // }, err => {
+        //     switch (err) {
+        //         case 400:
+        //             error.result = "Bad Request"
+        //             return res.status(400).json(error)
+        //         case 401:
+        //             console.error("catch-err", err)
+        //             error.result = "token unauthorized"
+        //             return res.status(401).json(error)
+        //     }
+        // }).catch(err => {
+        //     console.error("catch-err", err)
+        //     error.result = "token unauthorized"
+        //     return res.status(401).json(error)
+        // })
     })
     // ------------------------------Get Scrollable Books----------------------------------
     router.post("/scroll", (req, res) => {
@@ -52,29 +52,29 @@ const prepare = (router) => {
             error: true,
             result: "Bad Request"
         }
-        tokenValidator(authorization, agent, () => {
-            getScrollableBooks(queryType, scrollId, genres).then(response => {
-                data.result = response
-                return res.status(200).json(data)
-            }).catch(err => {
-                console.log("search-err", err)
-                return res.status(400).json(error)
-            })
-        }, err => {
-            switch (err) {
-                case 400:
-                    error.result = "Bad Request"
-                    return res.status(400).json(error)
-                case 401:
-                    console.error("catch-err", err)
-                    error.result = "token unauthorized"
-                    return res.status(401).json(error)
-            }
+        getScrollableBooks(queryType, scrollId, genres).then(response => {
+            data.result = response
+            return res.status(200).json(data)
         }).catch(err => {
-            console.error("catch-err", err)
-            error.result = "token unauthorized"
-            return res.status(401).json(error)
+            console.log("search-err", err)
+            return res.status(400).json(error)
         })
+        // tokenValidator(authorization, agent, () => {
+        // }, err => {
+        //     switch (err) {
+        //         case 400:
+        //             error.result = "Bad Request"
+        //             return res.status(400).json(error)
+        //         case 401:
+        //             console.error("catch-err", err)
+        //             error.result = "token unauthorized"
+        //             return res.status(401).json(error)
+        //     }
+        // }).catch(err => {
+        //     console.error("catch-err", err)
+        //     error.result = "token unauthorized"
+        //     return res.status(401).json(error)
+        // })
     })
     // ---------------------------------Get Books by Ids-------------------------------
     router.post("/ids", (req, res) => {
@@ -89,29 +89,29 @@ const prepare = (router) => {
             error: true,
             result: "Bad Request"
         }
-        tokenValidator(authorization, agent, () => {
-            getBooksByIds(ids).then(response => {
-                data.result = response
-                return res.status(200).json(data)
-            }).catch(err => {
-                console.log("mget-err", err)
-                return res.status(400).json(error)
-            })
-        }, err => {
-            switch (err) {
-                case 400:
-                    error.result = "Bad Request"
-                    return res.status(400).json(error)
-                case 401:
-                    console.error("catch-err", err)
-                    error.result = "token unauthorized"
-                    return res.status(401).json(error)
-            }
+        getBooksByIds(ids).then(response => {
+            data.result = response
+            return res.status(200).json(data)
         }).catch(err => {
-            console.error("catch-err", err)
-            error.result = "token unauthorized"
-            return res.status(401).json(error)
+            console.log("mget-err", err)
+            return res.status(400).json(error)
         })
+        // tokenValidator(authorization, agent, () => {
+        // }, err => {
+        //     switch (err) {
+        //         case 400:
+        //             error.result = "Bad Request"
+        //             return res.status(400).json(error)
+        //         case 401:
+        //             console.error("catch-err", err)
+        //             error.result = "token unauthorized"
+        //             return res.status(401).json(error)
+        //     }
+        // }).catch(err => {
+        //     console.error("catch-err", err)
+        //     error.result = "token unauthorized"
+        //     return res.status(401).json(error)
+        // })
     })
     // ---------------------------------Get By Genre-------------------------------
     router.get("/genres", (req, res) => {
@@ -151,7 +151,7 @@ const prepare = (router) => {
 
     })
     // ---------------------------------Search Books-------------------------------
-    router.get("/search", (req, res) => {
+    router.post("/search", (req, res) => {
         let { authorization, agent } = req.headers
         let { query } = req.body
         let data = {
@@ -162,29 +162,29 @@ const prepare = (router) => {
             error: true,
             result: "Bad Request"
         }
-        tokenValidator(authorization, agent, userId => {
-            getBooksBySearch(query).then(response => {
-                data.result = response
-                return res.status(200).json(data)
-            }).catch(err => {
-                console.log("search-err", err)
-                return res.status(400).json(error)
-            })
-        }, err => {
-            switch (err) {
-                case 400:
-                    error.result = "Bad Request"
-                    return res.status(400).json(error)
-                case 401:
-                    console.error("catch-err", err)
-                    error.result = "token unauthorized"
-                    return res.status(401).json(error)
-            }
+        getBooksBySearch(query).then(response => {
+            data.result = response
+            return res.status(200).json(data)
         }).catch(err => {
-            console.error("catch-err", err)
-            error.result = "token unauthorized"
-            return res.status(401).json(error)
+            console.log("search-err", err)
+            return res.status(400).json(error)
         })
+        // tokenValidator(authorization, agent, userId => {
+        // }, err => {
+        //     switch (err) {
+        //         case 400:
+        //             error.result = "Bad Request"
+        //             return res.status(400).json(error)
+        //         case 401:
+        //             console.error("catch-err", err)
+        //             error.result = "token unauthorized"
+        //             return res.status(401).json(error)
+        //     }
+        // }).catch(err => {
+        //     console.error("catch-err", err)
+        //     error.result = "token unauthorized"
+        //     return res.status(401).json(error)
+        // })
     })
 }
 // ----------------------------------------------------------------
